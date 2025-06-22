@@ -17,10 +17,17 @@ class AgendaController extends Controller
     function send(Request $request)
     {
         $validated = $request->validate([
-            "email" => "required|email",        
-            "password" => "required|min:6",
+            "id" => "required",        
         ]);
 
-        return response()->json(["ok" => true, $validated['email']]);
+        $agenda = Agenda::find($request->id);
+        $agenda->filled += 1;
+        $agenda->save();
+
+        if($agenda == null){
+            return response()->json(["error" => "Horario não encontrado"], 400);
+        }
+
+        return response()->json([$agenda]);
     }
 }
