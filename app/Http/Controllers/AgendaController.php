@@ -9,7 +9,16 @@ class AgendaController extends Controller
 {
     function test() 
     {
-        $agendas = Agenda::all();
+        $agendas = Agenda::all()->map(function ($agenda){
+
+            return [
+                "data" => $agenda->date,
+                "hora" => $agenda->hour,
+                "vagas" => $agenda->vacancy,
+                "preenchido" => $agenda->filled,
+            ];
+
+        });
 
         return response()->json($agendas);
     }
@@ -17,10 +26,18 @@ class AgendaController extends Controller
     function send(Request $request)
     {
         $validated = $request->validate([
-            "email" => "required|email",        
-            "password" => "required|min:6",
+            "id" => "required",        
         ]);
 
-        return response()->json(["ok" => true, $validated['email']]);
+        $agenda = Agenda::find($request->id);
+        
+        if(!$agenda){
+            return response()->json(['error' => true], 400);
+        } 
+
+        $agenda->filled += 1;
+        $agenda->save();
+
+        return response()->json(["ok" => true]);
     }
 }
