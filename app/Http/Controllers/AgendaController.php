@@ -30,14 +30,15 @@ class AgendaController extends Controller
         ]);
 
         $agenda = Agenda::find($request->id);
-        
-        if(!$agenda){
-            return response()->json(['error' => true], 400);
-        } 
 
         $agenda->filled += 1;
         $agenda->save();
 
-        return response()->json(["ok" => true]);
+        if($agenda == null){
+            return response()->json(["error" => "Horario não encontrado"], 400);
+        }
+
+        return response()->json([$agenda]);
+
     }
 }
